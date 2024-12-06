@@ -1,27 +1,64 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using SOTAM.Services;
 
 namespace SOTAM.Views.QueueManagement
 {
-    /// <summary>
-    /// Interaction logic for QueueManagement.xaml
-    /// </summary>
     public partial class QueueManagement : Window
     {
-        public QueueManagement()
+        private readonly QueueService _queueService;
+
+        public QueueManagement(QueueService queueService)
         {
             InitializeComponent();
+            _queueService = queueService;
+        }
+
+        private void AddToQueueButton_Click(object sender, RoutedEventArgs e)
+        {
+            string name = NameTextBox.Text;
+
+            int hours = 0;
+            if (HoursComboBox.SelectedItem != null)
+            {
+              
+                int.TryParse(((ComboBoxItem)HoursComboBox.SelectedItem).Content.ToString(), out hours);
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                MessageBox.Show("Please enter the customer's name.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (hours <= 0)
+            {
+                MessageBox.Show("Please select a valid time duration.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var queue = _queueService.AddToQueue(name, hours);
+
+            MessageBox.Show($"Added {name} to the queue for {hours} hour(s).", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            NameTextBox.Clear();
+            HoursComboBox.SelectedIndex = 0; 
+        }
+
+        private void HoursComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void NameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }
