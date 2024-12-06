@@ -1,0 +1,31 @@
+﻿<Window x:Class="SOTAM.Views.Registration.Registration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SOTAM.Views.Registration"
+        mc:Ignorable="d"
+        Title="Registration" Height="450" Width="395">
+   
+        <Grid>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="350">
+                <!-- Name TextBox with Watermark -->
+                <Grid Margin="0,10" Height="35">
+                    <TextBox Text="{Binding Name}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                    <TextBlock Text="Enter your name" Foreground="Gray" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0" IsHitTestVisible="False"/>
+                </Grid>
+
+                <!-- Username TextBox with Watermark -->
+                <Grid Margin="0,10" Height="35">
+                    <TextBox Text="{Binding Username}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                    <TextBlock Text="Enter username" Foreground="Gray" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0" IsHitTestVisible="False"/>
+                </Grid>
+
+                <!-- Password Box -->
+                <PasswordBox Password="{Binding Password}" Margin="0,10" Height="35" />
+
+                <!-- Register Button -->
+                <Button Content="Register" Command="{Binding RegisterCommand}" Margin="0,10" Height="35" />
+            </StackPanel>
+        </Grid>
+    </Window>

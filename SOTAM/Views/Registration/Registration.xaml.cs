@@ -12,14 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace SOTAM
+namespace SOTAM.Views.Registration
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for Registration.xaml
     /// </summary>
-    public partial class App : Application  // Ensure it inherits from Application
+    public partial class Registration : Window
     {
-        public App()
+        public Registration()
         {
             InitializeComponent();
         }
