@@ -5,6 +5,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:SOTAM"
              mc:Ignorable="d"
-             StartupUri="C:\Users\Janine Lapasaran\source\repos\SOTAM\SOTAM\Views\QueueManagement\QueueManagement.xaml">
+             StartupUri="Views\QueueManagement\QueueManagement.xaml">
     <!-- Set the StartupUri to your main window -->
 </Application>

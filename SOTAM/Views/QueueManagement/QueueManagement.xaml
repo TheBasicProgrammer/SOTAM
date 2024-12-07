@@ -3,108 +3,66 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewmodels="clr-namespace:SOTAM.ViewModels"
         Title="Queue Management" Height="600" Width="1026">
-
     <Window.DataContext>
         <viewmodels:QueueManagementViewModel/>
     </Window.DataContext>
-
     <Grid Background="#F9F9F9" Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Queue List -->
-            <RowDefinition Height="159*" />
-            <RowDefinition Height="26*"/>
-            <RowDefinition Height="76*"/>
+            <RowDefinition Height="111*"/>
+            <RowDefinition Height="161*"/>
         </Grid.RowDefinitions>
-
         <Grid.ColumnDefinitions>
-            <!-- Left Column for the Add to Queue Form -->
-            <ColumnDefinition Width="300"/>
-            <!-- Right Column for the Queue List -->
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Queue Form (Left Side) -->
-        <Border Background="White" CornerRadius="10" Padding="20" Margin="0,0,10,10" Grid.Column="0">
+        <!-- Add to Queue Form -->
+        <Border Background="White" BorderBrush="Gray" BorderThickness="1" Padding="20" Grid.Column="0" Grid.RowSpan="2">
             <StackPanel>
-                <TextBlock Text="Add to Queue"
-                           FontWeight="Bold"
-                           FontSize="18"
-                           Foreground="Black"
-                           Margin="0 0 0 20"
-                           HorizontalAlignment="Left"/>
+                <TextBlock Text="Add to Queue" FontWeight="Bold" FontSize="18" Margin="0 0 20 0"/>
 
-                <!-- Name Field -->
-                <TextBlock FontWeight="Bold" FontSize="14" Margin="0 0 0 5" HorizontalAlignment="Left">
-                    <Run Text="Name"/>
-                    <Run Text="*" Foreground="Red"/>
-                </TextBlock>
-                <TextBox FontSize="14"
-                         Margin="0 0 0 15"
-                         Padding="8"
-                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                         HorizontalAlignment="Stretch"/>
+                <TextBlock Text="Name" FontWeight="Bold"/>
+                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
 
-                <!-- Hours Field -->
-                <TextBlock FontWeight="Bold" FontSize="14" Margin="0 0 0 5" HorizontalAlignment="Left">
-                    <Run Text="Hours"/>
-                    <Run Text="*" Foreground="Red"/>
-                </TextBlock>
+                <TextBlock Text="Hours" FontWeight="Bold"/>
+                <!-- Hours ComboBox -->
                 <ComboBox FontSize="14"
                           Padding="8"
                           Margin="0 0 0 15"
-                          SelectedItem="{Binding Hours}"
-                          HorizontalAlignment="Stretch">
-                    <ComboBoxItem Content="1" IsSelected="True"/>
+                          SelectedValue="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValuePath="Content"
+                          HorizontalAlignment="Stretch"
+                          ToolTip="Select the number of hours">
+                    <ComboBoxItem Content="1" />
                     <ComboBoxItem Content="2"/>
                     <ComboBoxItem Content="3"/>
+                    <ComboBoxItem Content="4"/>
+                    <ComboBoxItem Content="5"/>
                 </ComboBox>
 
                 <!-- Add to Queue Button -->
-                <Button Content="Add to Queue"
-                        FontSize="14"
-                        Background="#0078D7"
-                        Foreground="White"
-                        Padding="10"
-                        Command="{Binding AddToQueueCommand}"
-                        IsEnabled="{Binding IsAddToQueueButtonEnabled}"
-                        HorizontalAlignment="Right" Click="Button_Click_1"/>
+                <Button Content="Add to Queue" Command="{Binding AddToQueueCommand}" Background="Green" Foreground="White"/>
             </StackPanel>
         </Border>
 
-        <!-- Queue List (Right Side) -->
-        <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Grid.RowSpan="3">
-            <DataGrid ItemsSource="{Binding QueueList}" 
-                      AutoGenerateColumns="False"
-                      HeadersVisibility="Column"
-                      RowHeight="35" Margin="0,10,0,0"
-                      SelectionChanged="DataGrid_SelectionChanged">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Customer" Binding="{Binding Customer}" Width="200" />
-                    <DataGridTextColumn Header="Hours" Binding="{Binding Hours}" Width="100" />
-                    <DataGridComboBoxColumn Header="Table" 
-                                            SelectedValueBinding="{Binding TableId}" 
-                                            ItemsSource="{Binding Tables}" 
-                                            DisplayMemberPath="TableId" 
-                                            Width="150" />
-                    <DataGridTemplateColumn Header="Status" Width="200">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="Confirm"
-                                            Command="{Binding DataContext.ConfirmCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding QueueId}"
-                                            Background="Blue" Foreground="White" Width="75" Margin="0,0,5,0"/>
-                                    <Button Content="Cancel"
-                                            Command="{Binding DataContext.CancelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding QueueId}"
-                                            Background="Red" Foreground="White" Width="75"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
+        <!-- Queue List -->
+        <DataGrid ItemsSource="{Binding QueueItems}" AutoGenerateColumns="False" Grid.Column="2" Margin="10,10,10,10" SelectionChanged="DataGrid_SelectionChanged" Grid.RowSpan="2">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Customer" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Hours" Binding="{Binding Hours}" Width="*"/>
+                <!-- Actions Column with Confirm and Cancel -->
+                <DataGridTemplateColumn Header="Actions">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Cancel" Width="70" Margin="5"/>
+                                <Button Content="Confirm" Width="70" Margin="5"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
