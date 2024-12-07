@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 
 namespace SOTAM.ViewModels
@@ -70,12 +71,16 @@ namespace SOTAM.ViewModels
         }
 
         public ICommand AddToQueueCommand { get; }
+        public ICommand ConfirmCommand { get; }
+        public ICommand CancelCommand { get; }
 
         // Constructor
         public QueueManagementViewModel()
         {
             _queueItems = new ObservableCollection<QueueItem>();
-            AddToQueueCommand = new RelayCommand(AddToQueue, CanAddToQueue);
+            AddToQueueCommand = new RelayCommand(AddToQueue);  // Non-parameterized command
+            ConfirmCommand = new RelayCommand<int>(OnConfirm); // Parameterized command
+            CancelCommand = new RelayCommand<int>(OnCancel);   // Parameterized command
             Hours = 1; // Default value
         }
 
@@ -100,6 +105,30 @@ namespace SOTAM.ViewModels
             IsAddToQueueButtonEnabled = !string.IsNullOrWhiteSpace(Name) && Hours > 0;
         }
 
+        // Confirm method
+        private void OnConfirm(int queueId)
+        {
+            var queueItem = QueueItems.FirstOrDefault(q => q.QueueId == queueId);
+            if (queueItem != null)
+            {
+                // Logic for confirming the queue
+                queueItem.Status = "Confirmed";
+                OnPropertyChanged(nameof(QueueItems)); // Notify that the status has changed
+            }
+        }
+
+        // Cancel method
+        private void OnCancel(int queueId)
+        {
+            var queueItem = QueueItems.FirstOrDefault(q => q.QueueId == queueId);
+            if (queueItem != null)
+            {
+                // Logic for canceling the queue
+                queueItem.Status = "Cancelled";
+                OnPropertyChanged(nameof(QueueItems)); // Notify that the status has changed
+            }
+        }
+
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -109,25 +138,51 @@ namespace SOTAM.ViewModels
     // Queue Item Model
     public class QueueItem
     {
+        public int QueueId { get; set; } // Add QueueId property for identification
         public string? Name { get; set; }
         public int Hours { get; set; }
+        public string Status { get; set; } = "Pending"; // Default status is "Pending"
     }
 
-    // RelayCommand Implementation
+    // RelayCommand Implementation for parameterized and non-parameterized commands
     public class RelayCommand : ICommand
     {
         private readonly Action _execute;
         private readonly Func<bool> _canExecute;
 
-        public RelayCommand(Action execute, Func<bool> canExecute)
+        // Constructor for non-parameterized command
+        public RelayCommand(Action execute, Func<bool> canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
+            _canExecute = canExecute ?? (() => true);  // Default to always enabled if no condition is passed
         }
 
         public bool CanExecute(object? parameter) => _canExecute();
 
         public void Execute(object? parameter) => _execute();
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
+    }
+
+    // RelayCommand Implementation for parameterized commands
+    public class RelayCommand<T> : ICommand
+    {
+        private readonly Action<T> _execute;
+        private readonly Func<T, bool> _canExecute;
+
+        public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute ?? (_ => true);  // Default to always enabled if no condition is passed
+        }
+
+        public bool CanExecute(object? parameter) => _canExecute((T)parameter);
+
+        public void Execute(object? parameter) => _execute((T)parameter);
 
         public event EventHandler? CanExecuteChanged
         {

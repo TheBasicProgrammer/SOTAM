@@ -14,4 +14,6 @@ public partial class QueueList
     public int? TableId { get; set; }
 
     public virtual Table? Table { get; set; }
+
+    public bool IsConfirmed { get; set; }
 }

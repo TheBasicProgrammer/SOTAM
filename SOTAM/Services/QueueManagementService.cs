@@ -1,69 +1,63 @@
 ﻿using SOTAM.Models;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace SOTAM.Services
 {
     public class QueueManagementService
     {
-        private readonly SotamContext _context;
+        private readonly ObservableCollection<QueueList> _queueList;
 
-        public QueueManagementService(SotamContext context)
+        public QueueManagementService()
         {
-            _context = context;
+            _queueList = new ObservableCollection<QueueList>();
         }
 
-        // To add a customer to the queue
-        public QueueList AddToQueue(string customer, int hours)
+        // Gets the queue list
+        public ObservableCollection<QueueList> GetQueueList()
         {
-            var queue = new QueueList
+            return _queueList;
+        }
+
+        // Adds a customer to the queue
+        public void AddToQueue(string customerName, int hours)
+        {
+            var newQueueItem = new QueueList
             {
-                Customer = customer,
-                Hours = hours
+                QueueId = _queueList.Count + 1,
+                Customer = customerName,
+                Hours = hours,
+                TableId = null,  // Table is empty initially
+                IsConfirmed = false // Initially, the queue item is not confirmed
             };
 
-            _context.QueueLists.Add(queue);
-            _context.SaveChanges();
-
-            return queue;
+            _queueList.Add(newQueueItem);
         }
 
-        // To assign a table to a customer in the queue
-        public QueueList? AssignTable(int queueId, int tableId)
+        // Confirms a customer from the queue and moves them to the table management system
+        public void ConfirmQueueItem(int queueId)
         {
-            var queue = _context.QueueLists.FirstOrDefault(q => q.QueueId == queueId);
-            var table = _context.Tables.FirstOrDefault(t => t.TableId == tableId);
-
-            if (queue != null && table != null && table.Status == "Available")
+            var queueItem = _queueList.FirstOrDefault(q => q.QueueId == queueId);
+            if (queueItem != null)
             {
-                queue.TableId = tableId;
-                table.Status = "Occupied";
-                _context.SaveChanges();
-                return queue;
-            }
+                // Mark the item as confirmed
+                queueItem.IsConfirmed = true;
 
-            return null; // Either queue or table not found, or table is unavailable
-        }
-
-        // Confirm the session and remove the queue entry
-        public void ConfirmSession(int queueId)
-        {
-            var queue = _context.QueueLists.FirstOrDefault(q => q.QueueId == queueId);
-
-            if (queue != null)
-            {
-                _context.QueueLists.Remove(queue);
-                _context.SaveChanges();
+                // You would pass the data to the Table Management system here
+                // For now, we just remove the item from the queue
+                _queueList.Remove(queueItem);
             }
         }
 
-        // Cancel a queue entry
-        public void CancelQueueEntry(int queueId)
+        // Cancels a customer from the queue
+        public void CancelQueueItem(int queueId)
         {
-            var queue = _context.QueueLists.FirstOrDefault(q => q.QueueId == queueId);
-
-            if (queue != null)
+            var queueItem = _queueList.FirstOrDefault(q => q.QueueId == queueId);
+            if (queueItem != null)
             {
-                _context.QueueLists.Remove(queue);
-                _context.SaveChanges();
+                // Remove the customer from the queue
+                _queueList.Remove(queueItem);
             }
         }
     }
